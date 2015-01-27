@@ -33,6 +33,7 @@ public class AbstractTest
     private Log logger = LogFactory.getLog(AbstractTest.class);
     protected static String testLinkURL;
     protected static String devKey;
+    private ApplicationContext ctx;
     
     @BeforeSuite(alwaysRun = true)
     public void setupContext() throws Exception
@@ -43,7 +44,7 @@ public class AbstractTest
         }
         List<String> contextXMLList = new ArrayList<String>();
         contextXMLList.add("wagon-context.xml");
-        ApplicationContext ctx = new ClassPathXmlApplicationContext(contextXMLList.toArray(new String[contextXMLList.size()]));
+        ctx = new ClassPathXmlApplicationContext(contextXMLList.toArray(new String[contextXMLList.size()]));
         TestServiceProperties properties =  (TestServiceProperties) ctx.getBean("testProperties");
         testLinkURL = properties.getTestlinkUrl();
         devKey = properties.getKey();
