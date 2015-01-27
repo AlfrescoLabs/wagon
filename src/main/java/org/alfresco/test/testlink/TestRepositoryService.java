@@ -21,7 +21,8 @@ import br.eti.kinoshita.testlinkjavaapi.model.TestPlan;
 import br.eti.kinoshita.testlinkjavaapi.model.TestProject;
 /**
  * Interface to test repository, a system that manages the tests
- * such as TestLink
+ * such as TestLink.
+ * 
  * @author Michael Suzuki
  *
  */

@@ -53,6 +53,11 @@ public class TestCase implements Serializable
         return id;
     }
     
+    public String getClassName()
+    {
+        return testClass.substring((testClass.lastIndexOf(".")+1)); 
+    }
+    
     public String getMethodName()
     {
         return methodName;

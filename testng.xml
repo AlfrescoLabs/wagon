@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="Suite" parallel="none">
-    <test name="Test">
+    <test name="DummyTest">
+        <classes>
+            <class name="org.alfresco.test.mock.DummyTest">
+                <methods>
+                    <include name="bye"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="DummyTest2">
         <classes>
             <class name="org.alfresco.test.mock.DummyTest2"/>
-            <class name="org.alfresco.test.mock.DummyTest">
-                <method>
-                    <include name="helloWorld"/>
-                    <include name="bye"/>
-                </method>
-            </class>
         </classes>
     </test>
 </suite>

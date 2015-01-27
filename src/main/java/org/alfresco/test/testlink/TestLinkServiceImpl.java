@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  * This file is part of Alfresco
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -97,7 +97,6 @@ public class TestLinkServiceImpl implements TestRepositoryService
         }
         return testlinkAPIClient.getTestCaseByExternalId(id, 1);
     }
-    @Override
     public List<String> getTestCases(String testPlan)
     {
         TestPlan plan = getTestPlan(testPlan, DEFAULT_PROJECT);

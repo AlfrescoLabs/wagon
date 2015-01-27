@@ -42,12 +42,8 @@ import br.eti.kinoshita.testlinkjavaapi.util.TestLinkAPIException;
  * @author Michael Suzuki
  *
  */
-public class TestServiceTest
+public class TestServiceTest extends AbstractTest
 {
-    private String testLinkURL = "https://testlink.alfresco.com/lib/api/xmlrpc.php";
-    private String devKey = "30d16ba28b8fa4748376f14ec4ce0d1e";
-    
-    
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void connectNullUrl()
     {
@@ -84,13 +80,6 @@ public class TestServiceTest
         List<String> testcases = service.getTestCases("Ent5.0-SanityTests-v1");
         Assert.assertNotNull(testcases);
     }
-//    @Test(expectedExceptions = IllegalArgumentException.class)
-//    public void mapTestNull()
-//    {
-//        TestRepositoryService testlink = new TestLinkServiceImpl(testLinkURL, devKey);
-//        TestService service = new TestServiceImpl(testlink);
-//        service.mapTests(null);
-//    }
     @Test
     public void mapTest() throws TestLinkAPIException, ClassNotFoundException, IOException
     {
@@ -123,7 +112,7 @@ public class TestServiceTest
         tests.add("invalid-test-123");
         List<TestCase> result = service.matchTests(tests);
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.get(0).getTestClass(), null);
+        Assert.assertEquals(result.size(), 0);
     }
     @Test
     public void mapTests()
@@ -139,19 +128,17 @@ public class TestServiceTest
         List<TestCase> result = service.matchTests(tests);
         Assert.assertNotNull(result);
         TestCase testcase = result.get(0);
-        Assert.assertTrue(testcase.getTestClass().endsWith("org.alfresco.test.TestServiceTest$DummyTest"));
+        Assert.assertTrue(testcase.getTestClass().endsWith("org.alfresco.test.mock.DummyTest"));
         Assert.assertEquals("AONE-11", testcase.getId());
         
         testcase = result.get(1);
-        Assert.assertTrue(testcase.getTestClass().endsWith("org.alfresco.test.TestServiceTest$DummyTest2"));
+        Assert.assertTrue(testcase.getTestClass().endsWith("org.alfresco.test.mock.DummyTest2"));
         Assert.assertEquals("AONE-22", testcase.getId());
         
         testcase = result.get(2);
-        Assert.assertTrue(testcase.getTestClass().endsWith("org.alfresco.test.TestServiceTest$DummyTest"));
+        Assert.assertTrue(testcase.getTestClass().endsWith("org.alfresco.test.mock.DummyTest"));
         Assert.assertEquals("AONE-123", testcase.getId());
-        
-        testcase = result.get(3);
-        Assert.assertNull(testcase.getTestClass());
+        Assert.assertEquals(result.size(), 3);
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -176,8 +163,7 @@ public class TestServiceTest
         TestService service = new TestServiceImpl(testlink);
         service.buildTestng(Collections.<TestCase> emptyList());
     }
-    @Test
-    public void buildTestng() throws TransformerConfigurationException
+    public void buildTestng() throws TransformerException
     {
         TestRepositoryService testlink = new TestLinkServiceImpl(testLinkURL, devKey);
         TestService service = new TestServiceImpl(testlink);
@@ -191,25 +177,16 @@ public class TestServiceTest
         Assert.assertNotNull(documentPlan);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         DOMSource source = new DOMSource(documentPlan);
-        
-        
- 
         // Output to console for testing
         StreamResult result = new StreamResult(System.out);
-        try
-        {
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.transform(source, result);
-        }
-        catch (TransformerConfigurationException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (TransformerException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        System.out.println(result.toString());
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(source, result);
+        String expected = 
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><suite name=\"Suite\" parallel=\"none\">"
+                + "<test name=\"DummyTest\"><classes><class name=\"org.alfresco.test.mock.DummyTest\"><methods>"
+                + "<include name=\"helloWorld\"/></methods></class></classes></test>"
+                + "<test name=\"DummyTest2\"><classes><class name=\"org.alfresco.test.mock.DummyTest2\"/>"
+                + "</classes></test></suite>";
+        Assert.assertEquals(result.toString(), expected);
     }
 }

@@ -41,8 +41,17 @@ public class DummyTest
         Assert.assertTrue(true);
     }
     
+    @AlfrescoTest(id="41", jira="123", testlink="AONE-1231")
+    @Test()
+    public void howAreYou()
+    {
+        logger.info("Running DummyTest how are you");
+        Assert.assertTrue(true);
+        
+    }
+    
     @AlfrescoTest(id="5", testlink="AONE-6")
-    @Test
+    @Test(dependsOnMethods="howAreYou", ignoreMissingDependencies=true)
     public void bye()
     {
         logger.info("Running DummyTest bye");

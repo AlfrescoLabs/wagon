@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.alfresco.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -31,10 +32,8 @@ import br.eti.kinoshita.testlinkjavaapi.util.TestLinkAPIException;
  * @author Michael Suzuki
  *
  */
-public class TestLinkServiceTest
+public class TestLinkServiceTest extends AbstractTest
 {
-    private String testLinkURL = "https://testlink.alfresco.com/lib/api/xmlrpc.php";
-    private String devKey = "30d16ba28b8fa4748376f14ec4ce0d1e";
 //    private String testplan = "Ent5.0-AutomationFullRegression-v4";
     private String testplan = "Ent5.0-SanityTests-v1";
     private String testcase = "AONE-14106";

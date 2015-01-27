@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  * This file is part of Alfresco
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -41,7 +41,7 @@ import com.sun.star.uno.RuntimeException;
 /**
  * Service that manages and provides:
  * <ul>
- * <li>The ability to generate testng config based on test cases in a test plan.</li>
+ *      <li>The ability to generate testng config based on test cases in a test plan.</li>
  * <ul>
  * 
  * @author Michael Suzuki
@@ -69,9 +69,10 @@ public class TestServiceImpl implements TestService
 
     }
     /**
-     * Prepares map of all test ids and path to test.
-     * Tests marked with an annotated AlfrescoTest() are collected into
-     * the hash map with details of the path to find test method or class. 
+     * Prepares map of all test ids and test location.
+     * Tests marked with an annotated {@link AlfrescoTest} are collected into
+     * the hash map along with details of the path which is then used to populate
+     * the testng configuration file. 
      */
     private void prepareTestMap()
     {
@@ -117,7 +118,6 @@ public class TestServiceImpl implements TestService
         return testLinkService.getTestCases(testPlanID);
     }
     
-    @Override
     public List<String> getTestCases(String testPlan)
     {
         if(StringUtils.isEmpty(testPlan))
@@ -152,7 +152,7 @@ public class TestServiceImpl implements TestService
         }
         return tests;
     }
-    @Override
+    
     public Document buildTestng(List<TestCase> testcases)
     {
         if(testcases == null || testcases.isEmpty())
@@ -170,14 +170,24 @@ public class TestServiceImpl implements TestService
             throw new RuntimeException("Unable to parse");
         }
         /**
-         * Format of xml output should be:
+         * Format of xml output for mock tests should be:
          *  <?xml version="1.0" encoding="UTF-8"?>
          *  <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
          *  <suite name="Suite" parallel="none">
-         *      <test name="Test">
+         *      <-- Run only one test method from test and exclude the rest in the class-->
+         *      <test name="DummyTest">
          *          <classes>
-         *              <class name="org.alfresco.utils.HttpUtilTest"/>
-         *              <class name="org.alfresco.test.testlink.TestLinkServiceTest"/>
+         *              <class name="org.alfresco.test.DummyTest">
+         *                  <methods>
+         *                      <include name="testMethod" />
+         *                  </methods>
+         *              </class>
+         *          </classes>
+         *      </test> 
+         *      <-- Run all tests from class -->
+         *      <test name="DummyTest2">
+         *          <classes>
+         *              <class name="org.alfresco.test.DummyTest2"/>
          *          </classes>
          *      </test> <!-- Test -->
          *  </suite> <!-- Suite -->
@@ -186,25 +196,23 @@ public class TestServiceImpl implements TestService
         Document doc = docBuilder.newDocument();
         Element rootElement = doc.createElement("suite");
         
+        //Generate Suite element
         rootElement.setAttribute("name", "Suite");
         rootElement.setAttribute("parallel", "none");
         doc.appendChild(rootElement);
         
-        //Test elements <test name="Test">
-        Element test = doc.createElement("test");
-        test.setAttribute("name", "Test");
-        rootElement.appendChild(test);
-        
-        /*Test casses
-         *<classes>
-         *    <class name="org.alfresco.utils.HttpUtilTest"/>
-         *</classes>
-         */
-        Element testclasses = doc.createElement("classes");
-        test.appendChild(testclasses);
-        
+        //----------------------------------------------------
         for(TestCase testcase : testcases)
         {
+            //Generate Test element <test name="Name of test class">
+            Element test = doc.createElement("test");
+            String testClassName = testcase.getClassName();
+            test.setAttribute("name", testClassName);
+            rootElement.appendChild(test);
+            //Generate test classes
+            Element testclasses = doc.createElement("classes");
+            test.appendChild(testclasses);
+
             Element testclass = doc.createElement("class");
             testclass.setAttribute("name", testcase.getTestClass());
             testclasses.appendChild(testclass);
@@ -212,9 +220,9 @@ public class TestServiceImpl implements TestService
             if(!StringUtils.isEmpty(testcase.getMethodName()))
             {
                 /*<class name="test.bla.Test1">
-                 * <methods>
-                 *    <include name="testMethod" />
-                 *</methods>
+                 *    <methods>
+                 *        <include name="testMethod" />
+                 *    </methods>
                  *</class>
                  */
                 Element methods = doc.createElement("method");
