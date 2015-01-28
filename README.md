@@ -1,5 +1,5 @@
 ### Wagon
-Wagon framework, a test run that load tests from different projects and runs.
+Wagon framework, a test runner based on testng that load tests from different projects and runs.
 
 ### Get the code
 
